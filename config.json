@@ -1,0 +1,9 @@
+{
+    "aliases": 
+    {
+      "main": "int main(int argc, int argv)\n{\n\n\n    return 0;\n}\n",
+      "std": "using namespace std;",
+      "email": "magibson@tycoint.com",
+      "sig":"Matthew Gibson, Software Engineer, AD"
+    }
+}
