@@ -84,10 +84,17 @@ def OnKeyPress(event):
   global currentString
   global exitCount
 
+  logFile=open(logFileName,'a')
+
+  if event.Ascii == 0:
+    if len(currentString) > 0:
+      currentString = currentString[:-1]
+
+    log('Current alias: {}\n'.format(currentString), logFile)
+    return
+
   currentChar = chr(event.Ascii)
   isDelimiter = (currentChar == delimiter)
-
-  logFile=open(logFileName,'a')
 
   # If we already have an alias or this character is a delimiter, add to currentString
   if (delimiter in currentString) or isDelimiter:

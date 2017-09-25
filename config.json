@@ -1,7 +1,7 @@
 {
     "aliases": 
     {
-      "main": "int main(int argc, int argv)\n{\n\n\n    return 0;\n}\n",
+      "main": "int main(int argc, char** argv)\n{\n\n\n    return 0;\n}\n",
       "std": "using namespace std;"
     }
 }
