@@ -54,8 +54,8 @@ def pasteReplacement(replacement):
 
   windowName = subprocess.check_output('xdotool getwindowname $(xdotool getwindowfocus)', shell=True)
 
-  # Window name containing '~' is most likely a terminal. SSH session terminals don't return a window name
-  if '~' in windowName or len(windowName) == 0:
+  # Window name containing '@' is most likely a terminal. SSH session terminals don't return a window name
+  if '@' in windowName or len(windowName) == 0:
     subprocess.check_output("echo \"" + replacement + "\" > /tmp/temp-string-replace",  shell=True)
     subprocess.check_output("xsel --input < /tmp/temp-string-replace",                  shell=True)
 
