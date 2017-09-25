@@ -9,11 +9,12 @@ import subprocess
 import json
 
 
-logFileName       ='/tmp/keys-history.log'
+logFileName    ='/tmp/keys-history.log'
 delimiter      = '-'
 currentString  = ''
 aliases        = {}
 
+exitCount      = 0
 
 def getReplacements(configFile):
 
@@ -81,6 +82,7 @@ def log(message, file):
 def OnKeyPress(event):
 
   global currentString
+  global exitCount
 
   currentChar = chr(event.Ascii)
   isDelimiter = (currentChar == delimiter)
@@ -113,9 +115,14 @@ def OnKeyPress(event):
   if len(currentString) > 0:
     log('Current alias: {}\n'.format(currentString), logFile)
 
-  if currentChar=='q':
-    logFile.close()
-    new_hook.cancel()
+  if currentChar=='`':
+    exitCount += 1
+
+    if exitCount > 1:
+      logFile.close()
+      new_hook.cancel()
+  else:
+    exitCount = 0
 
 
 ##### ENTRY POINT #####
