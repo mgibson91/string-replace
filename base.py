@@ -65,7 +65,7 @@ class AliasKeyListener(BaseKeyListener):
                 if self.aliasPositions[alias] == len(alias):
                     return True, TextReplacement(self.aliasPositions[alias], self.aliasReplacements[alias])
             else: 
-                self.aliasPositions[alias] = 0 if (alias[0] !``= currentChar) else 1
+                self.aliasPositions[alias] = 0 if (alias[0] != currentChar) else 1
 
         return False, None
 

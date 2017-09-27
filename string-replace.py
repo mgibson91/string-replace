@@ -1,6 +1,8 @@
 import sys
 import subprocess
 import json
+import shlex
+import os.path
 
 import pyxhook
 sys.path.append('pyperclip-1.5.27')
@@ -69,9 +71,24 @@ def OnKeyPress(event):
     else:
         exitCount = 0
 
-aliasKeyListener = AliasKeyListener('config.json')
+userConfigFile    = './config.json'
+defaultConfigFile = './config.json.default'
 
-#Start
+configFile = ''
+
+if os.path.isfile(userConfigFile):
+    configFile = userConfigFile
+
+elif os.path.isfile(defaultConfigFile):
+    configFile = defaultConfigFile
+
+else:
+    print 'No config files found. Exiting'
+    exit(1)
+
+# Start new key listener
+aliasKeyListener = AliasKeyListener(configFile)
+
 new_hook = pyxhook.HookManager()  # Instantiate HookManager class
 new_hook.KeyDown = OnKeyPress     # Listen to all keystrokes
 new_hook.HookKeyboard()           # Hook the keyboard
