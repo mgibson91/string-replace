@@ -8,14 +8,32 @@ import pyxhook
 sys.path.append('pyperclip-1.5.27')
 import pyperclip
 
-from base import AliasKeyListener
+from key_handlers.handler_base import BaseKeyHandler, TextReplacement
+from key_handlers.handler_alias import AliasKeyHandler
 
 debug       = False
 logFileName = '/tmp/keys-history.log'
 
+textHandlers = []
 
 exitCount = 0
 
+def getConfigFile():
+
+    userConfigFile    = './config.json'
+    defaultConfigFile = './config.json.default'
+
+    configFile = ''
+
+    if os.path.isfile(userConfigFile):
+        configFile = userConfigFile
+
+    elif os.path.isfile(defaultConfigFile):
+        configFile = defaultConfigFile
+
+    return configFile        
+
+#
 # Using 'BackSpace' remove the required number of characters
 def removeCharacters(numChars):
 
@@ -40,6 +58,7 @@ def pasteReplacement(replacement, isTerminal):
 
 
 def replaceString(removeLength, replacement, isTerminal):
+
     removeCharacters(removeLength)
     pasteReplacement(replacement, isTerminal)
 
@@ -47,6 +66,11 @@ def replaceString(removeLength, replacement, isTerminal):
 #     if (logFile):
 #         logFile.write(message)
 
+def resetTextHandlers():
+    
+    for handler in textHandlers:        
+        if handler:
+            handler.reset()
 
 # This function is called everytime a key is pressed.
 def OnKeyPress(event):
@@ -56,11 +80,19 @@ def OnKeyPress(event):
 
     # logFile = open(logFileName, 'a')
 
-    isMatch, replacement = aliasKeyListener.logKey(event)
+    for handler in textHandlers:
 
-    if (isMatch):
-        isTerminal = 'term' in event.WindowProcName
-        replaceString(replacement.removeLength, replacement.text, isTerminal)
+        isMatch, replacement = handler.getTextReplacement(event)
+
+        if isMatch:
+            
+            isTerminal = 'term' in event.WindowProcName
+            replaceString(replacement.removeLength, replacement.text, isTerminal)
+
+            # Reset all handlers and return
+            resetTextHandlers()
+            return
+
 
     if chr(event.Ascii) == '`':
         exitCount += 1
@@ -71,23 +103,21 @@ def OnKeyPress(event):
     else:
         exitCount = 0
 
-userConfigFile    = './config.json'
-defaultConfigFile = './config.json.default'
 
-configFile = ''
+# Get config data
+configFile = getConfigFile()
 
-if os.path.isfile(userConfigFile):
-    configFile = userConfigFile
-
-elif os.path.isfile(defaultConfigFile):
-    configFile = defaultConfigFile
-
-else:
+if not configFile :
     print 'No config files found. Exiting'
     exit(1)
 
-# Start new key listener
-aliasKeyListener = AliasKeyListener(configFile)
+# Add key handlers
+
+# Alias key handler
+try:
+    textHandlers.append(AliasKeyHandler(configFile))
+except Exception as e:
+    print 'Unable to add alias key handler: {}'.format(e)
 
 new_hook = pyxhook.HookManager()  # Instantiate HookManager class
 new_hook.KeyDown = OnKeyPress     # Listen to all keystrokes

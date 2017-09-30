@@ -5,5 +5,5 @@ Ubuntu install steps:
 
 1. sudo apt-get install python-pip
 2. pip install pyperclip
-3. sudo apt install xdotool xsel
+3. sudo apt install xdotool xsel python-xlib
  
