@@ -1,7 +1,10 @@
 import sys
 import subprocess
+import time
 import json
 import shlex
+import signal
+import threading
 import os.path
 
 import pyxhook
@@ -11,12 +14,14 @@ import pyperclip
 from key_handlers.handler_base import BaseKeyHandler, TextReplacement
 from key_handlers.handler_alias import AliasKeyHandler
 
-debug       = False
-logFileName = '/tmp/keys-history.log'
 
-textHandlers = []
+# Register SIGINT handler to exit on 'ctrl + C'
+def sigintHandler(signum, frame):
+    print 'Exiting'
+    keyHookManager.cancel()
+    exit(0)
 
-exitCount = 0
+signal.signal(signal.SIGINT, sigintHandler)
 
 def getConfigFile():
 
@@ -44,27 +49,20 @@ def removeCharacters(numChars):
 def pasteReplacement(replacement, isTerminal):
 
     if isTerminal:
-        subprocess.check_output(
-            "echo \"" + replacement + "\" > /tmp/temp-string-replace",  shell=True)
-        subprocess.check_output(
-            "xsel --input < /tmp/temp-string-replace",                  shell=True)
+        subprocess.check_output("echo \"" + replacement + "\" > /tmp/temp-string-replace",  shell=True)
+        subprocess.check_output("xsel --input < /tmp/temp-string-replace",                  shell=True)
 
     # Use pyperclip for GUI applications
     else:
         pyperclip.copy(replacement)
 
-    subprocess.check_output(
-        '/usr/bin/xdotool key --clearmodifiers Shift+Insert', shell=True)
+    subprocess.check_output('/usr/bin/xdotool key --clearmodifiers Shift+Insert', shell=True)
 
 
 def replaceString(removeLength, replacement, isTerminal):
 
     removeCharacters(removeLength)
     pasteReplacement(replacement, isTerminal)
-
-# def log(message, logFile):
-#     if (logFile):
-#         logFile.write(message)
 
 def resetTextHandlers():
     
@@ -78,12 +76,9 @@ def OnKeyPress(event):
     global currentString
     global exitCount
 
-    # logFile = open(logFileName, 'a')
-
     for handler in textHandlers:
 
-        isMatch, replacement = handler.getTextReplacement(event)
-
+        isMatch, replacement = handler.checkForTextReplacement(event)
         if isMatch:
             
             isTerminal = 'term' in event.WindowProcName
@@ -94,16 +89,6 @@ def OnKeyPress(event):
             return
 
 
-    if chr(event.Ascii) == '`':
-        exitCount += 1
-
-        if exitCount > 1:
-            # logFile.close()
-            new_hook.cancel()
-    else:
-        exitCount = 0
-
-
 # Get config data
 configFile = getConfigFile()
 
@@ -112,6 +97,8 @@ if not configFile :
     exit(1)
 
 # Add key handlers
+textHandlers = []
+
 
 # Alias key handler
 try:
@@ -119,7 +106,16 @@ try:
 except Exception as e:
     print 'Unable to add alias key handler: {}'.format(e)
 
-new_hook = pyxhook.HookManager()  # Instantiate HookManager class
-new_hook.KeyDown = OnKeyPress     # Listen to all keystrokes
-new_hook.HookKeyboard()           # Hook the keyboard
-new_hook.start()                  # Start the session
+
+keyHookManager = pyxhook.HookManager()  # Instantiate HookManager class
+keyHookManager.KeyDown = OnKeyPress     # Listen to all keystrokes
+keyHookManager.HookKeyboard()           # Hook the keyboard
+
+def logKeys():
+    keyHookManager.start()             # Start the session
+
+keyLoggingThread = threading.Thread(target=logKeys)
+keyLoggingThread.start()
+
+while(True):
+    time.sleep(1000)

@@ -1,12 +1,18 @@
 {
+    "general":
+    {
+        "tabCharacters": 4,
+        "keyBufferLimit": 20,
+        "debug": "true"
+    },
     "aliases": 
     {
-      "amain": "int main(int argc, char** argv)\n{\n\n\n    return 0;\n}\n",
-      "astd": "using namespace std;",
-      "aproto": "#include <iostream>\n#include <string>\n#include <sstream>\n#include <vector>\n#include <map>\n\nusing namespace std;\n\nint main(int argc, char** argv)\n{\n    \n\n    return 0;\n}",
-      "abash": "#!/bin/bash",
-      "apython": "#!/usr/bin/env python",
-      "abtest": "BOOST_AUTO_TEST_CASE(testName)\n{\n\n}",
-      "awatch": "file=testFile; if [ ! -x $file ]; then touch $file; fi; while [ 1 ]; do inotifywait -e modify $file; echo action; done"
+        "amain": "int main(int argc, char** argv)\n{\n\n\n    return 0;\n}\n",
+        "astd": "using namespace std;",
+        "aproto": "#include <iostream>\n#include <string>\n#include <sstream>\n#include <vector>\n#include <map>\n\nusing namespace std;\n\nint main(int argc, char** argv)\n{\n    \n\n    return 0;\n}",
+        "abash": "#!/bin/bash",
+        "apython": "#!/usr/bin/env python",
+        "abtest": "BOOST_AUTO_TEST_CASE(testName)\n{\n\n}",
+        "awatch": "file=testFile; if [ ! -x $file ]; then touch $file; fi; while [ 1 ]; do inotifywait -e modify $file; echo action; done"
     }
 }
