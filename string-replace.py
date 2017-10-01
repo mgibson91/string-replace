@@ -13,6 +13,7 @@ import pyperclip
 
 from key_handlers.handler_base import BaseKeyHandler, TextReplacement
 from key_handlers.handler_alias import AliasKeyHandler
+from key_handlers.handler_template import TemplateKeyHandler
 
 
 # Register SIGINT handler to exit on 'ctrl + C'
@@ -100,11 +101,17 @@ if not configFile :
 textHandlers = []
 
 
-# Alias key handler
+# # Alias key handler
+# try:
+#     textHandlers.append(AliasKeyHandler(configFile))
+# except Exception as e:
+#     print 'Unable to add alias key handler: {}'.format(e)
+
+# Template key handler
 try:
-    textHandlers.append(AliasKeyHandler(configFile))
+    textHandlers.append(TemplateKeyHandler(configFile))
 except Exception as e:
-    print 'Unable to add alias key handler: {}'.format(e)
+    print 'Unable to add template key handler: {}'.format(e)
 
 
 keyHookManager = pyxhook.HookManager()  # Instantiate HookManager class
