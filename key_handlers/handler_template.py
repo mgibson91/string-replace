@@ -1,6 +1,6 @@
 from handler_base import TextReplacement, BaseKeyHandler
 from handler_continuous_base import BaseContinuousKeyHandler
-from common.utils import tryCastToInt
+from common.utils import tryCastToInt, getValueFromDictionary
 
 import re
 import json
@@ -11,10 +11,6 @@ class TemplateKeyHandler(BaseContinuousKeyHandler):
     templates = {}
     numTemplateParams = {}
 
-    keyDelim = '-'
-    termChar = ';'
-    delimChar = ','
-
     # Constructor - Read config
     def __init__(self, configFile):
         super(TemplateKeyHandler, self).__init__(configFile)
@@ -23,14 +19,18 @@ class TemplateKeyHandler(BaseContinuousKeyHandler):
         return 'Template'
 
     # Base class will call update config
-    def updateConfig(self, configFile):      
+    def updateConfig(self, templateConfig):      
 
-        self.logDebug('Updating template config')
+        if not templateConfig:
+            return
 
-        with open(configFile) as jsonConfig:
-            data = json.load(jsonConfig)
+        self.logDebug('Updating template config\n')
 
-        configTemplates = data['templates']
+        self.termChar  = getValueFromDictionary(templateConfig, 'terminationCharacter', ';')
+        self.delimChar = getValueFromDictionary(templateConfig, 'parameterDelimiter', ',')
+
+        # It is ok to fail with an exception here. It means this handler won't be used
+        configTemplates = templateConfig['data']
 
         for template in configTemplates:
 
@@ -92,19 +92,11 @@ class TemplateKeyHandler(BaseContinuousKeyHandler):
 
     # Return text match if any exists
     def getTextReplacement(self, character):
-
-        if (self.debug):
-            print 'currentKeyString: ' + self.currentKeyString
       
         # Iterate 
         for template in self.templates:  
 
-            test1 = self.currentKeyString
-            test2 = template + '-'
-
-            # print '`%s` == `%s` ? %s', (test1, test2, test1 == test2)
-
-            keyString = template + self.keyDelim
+            keyString = template
 
             pos = self.currentKeyString.find(keyString)
             if pos >= 0:
@@ -115,7 +107,7 @@ class TemplateKeyHandler(BaseContinuousKeyHandler):
                 termPos = paramString.find(self.termChar)
 
                 if (termPos > 0):
-                    self.logDebug('Param string: '.format(paramString))
+                    self.logDebug('Param string: {}'.format(paramString))
                     params = paramString[:termPos].split(self.delimChar)
 
                     self.logDebug('Match: First, Term - ' + paramString)

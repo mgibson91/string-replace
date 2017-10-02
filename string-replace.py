@@ -63,7 +63,12 @@ def pasteReplacement(replacement, isTerminal):
 def replaceString(removeLength, replacement, isTerminal):
 
     removeCharacters(removeLength)
-    pasteReplacement(replacement, isTerminal)
+    
+    try:
+        pasteReplacement(replacement, isTerminal)
+    except Exception as e:
+        print 'Got error `{}` pasting text: {}'.format(e, replacement)
+    
 
 def resetTextHandlers():
     
@@ -101,11 +106,11 @@ if not configFile :
 textHandlers = []
 
 
-# # Alias key handler
-# try:
-#     textHandlers.append(AliasKeyHandler(configFile))
-# except Exception as e:
-#     print 'Unable to add alias key handler: {}'.format(e)
+# Alias key handler
+try:
+    textHandlers.append(AliasKeyHandler(configFile))
+except Exception as e:
+    print 'Unable to add alias key handler: {}'.format(e)
 
 # Template key handler
 try:

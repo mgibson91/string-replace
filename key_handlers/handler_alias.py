@@ -16,23 +16,18 @@ class AliasKeyHandler(BaseContinuousKeyHandler):
         return 'Alias'
 
     # Base class will call update config
-    def updateConfig(self, configFile):      
+    def updateConfig(self, aliasConfig):      
 
-        self.logDebug('Updating alias config')
+        self.logDebug('Updating alias config\n')
 
-        with open(configFile) as jsonConfig:
-            data = json.load(jsonConfig)
-
-        configReplacements = data['aliases']
+        # It is ok to fail with an exception here. It means this handler won't be used
+        configReplacements = aliasConfig['data']
 
         for alias in configReplacements:
             self.aliasReplacements[alias] = configReplacements[alias]
 
     # Return text match if any exists
     def getTextReplacement(self, character):
-
-        if (self.debug):
-            print 'currentKeyString: ' + self.currentKeyString
       
         # Iterate 
         for alias in self.aliasReplacements:  
