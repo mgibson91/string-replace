@@ -23,7 +23,7 @@
       {
         "name": "template",
         "parameterDelimiter": ",",
-        "terminationCharacter": "#",
+        "terminationCharacter": ";",
         "general":
         {
           "keyBufferLimit": 50
